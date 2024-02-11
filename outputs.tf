@@ -9,3 +9,5 @@ output "instance_arn" {
 output "target_az" {
   value = data.aws_region.current.name
 }
+
+
