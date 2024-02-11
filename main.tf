@@ -62,35 +62,36 @@ module "blog_sg" {
 
 }
 
-module "alb" {
-  source = "terraform-aws-modules/alb/aws"
-  version = "9.6.0"
+module "blog_alb" {
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 6.0"
 
+  name = "blog-alb"
 
-  name    = "blog-alb"
-  vpc_id  = module.blog_vpc.vpc_id
-  subnets = module.blog_vpc.public_subnets
+  load_balancer_type = "application"
 
-  security_groups = [module.blog_sg.security_group_id]
- 
+  vpc_id             = module.blog_vpc.vpc_id
+  subnets            = module.blog_vpc.public_subnets
+  security_groups    = [module.blog_sg.security_group_id]
 
-  access_logs = {
-    bucket = "blog-logs"
-  }
-
-
-  target_groups = {
-    ex-instance = {
-      name_prefix      = "h1"
-      protocol         = "HTTP"
-      port             = 80
+  target_groups = [
+    {
+      name_prefix      = "blog-"
+      backend_protocol = "HTTP"
+      backend_port     = 80
       target_type      = "instance"
     }
-  }
+  ]
+
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+    }
+  ]
 
   tags = {
-    Environment = "Development"
-    Project     = "Example"
+    Environment = "dev"
   }
 }
-
