@@ -70,9 +70,8 @@ module "alb" {
 
   subnets = module.blog_vpc.public_subnets
 
-  security_group_ingress_rules = module.blog_sg.ingress_rules    
+  security_group_ingress_rules = module.blog_sg.ingress_rules
   security_group_egress_rules  = module.blog_sg.egress_rules
-
 
   # Security Group
   access_logs = {
