@@ -62,19 +62,17 @@ module "blog_sg" {
 
 }
 
-module "nlb" {
+module "alb" {
   source = "terraform-aws-modules/alb/aws"
+  version = "9.6.0"
 
-  name               = "my-nlb"
-  load_balancer_type = "network"
-  vpc_id             = "vpc-abcde012"
-  subnets            = ["subnet-abcde012", "subnet-bcde012a"]
 
-  # Security Group
-  enforce_security_group_inbound_rules_on_private_link_traffic = "on"
+  name    = "blog-alb"
+  vpc_id  = module.blog_vpc.vpc_id
+  subnets = module.blog_vpc.subnets
 
-  security_group_ingress_rules = module.blog_sg.ingress_rules ["http-80-tcp"]
-  security_group_egress_rules  = module.blog_vpc.egress_rules ["all-all"]
+  security_groups = [module.blog_sg.security_group_id]
+ 
 
   access_logs = {
     bucket = "blog-logs"
@@ -82,11 +80,11 @@ module "nlb" {
 
 
   target_groups = {
-    ex-target = {
-      name_prefix = "blog-"
-      protocol    = "TCP"
-      port        = 80
-      target_type = "ip"
+    ex-instance = {
+      name_prefix      = "h1"
+      protocol         = "HTTP"
+      port             = 80
+      target_type      = "instance"
     }
   }
 
@@ -95,5 +93,4 @@ module "nlb" {
     Project     = "Example"
   }
 }
-
 
