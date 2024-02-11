@@ -67,19 +67,31 @@ module "alb" {
 
   name    = "blog-alb"
   vpc_id  = module.blog_vpc.vpc_id
-
-  subnets = module.blog_vpc.public_subnets
-
-  security_group_ingress_rules = module.blog_sg.ingress_rules
-  security_group_egress_rules  = module.blog_sg.egress_rules
+  subnets = blog_vpc.public_subnets
 
   # Security Group
+  security_group_ingress_rules = {
+    all_http = {
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+      description = "HTTP web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  }
+  security_group_egress_rules = {
+    all = {
+      ip_protocol = "-1"
+      cidr_ipv4   = "10.0.0.0/16"
+    }
+  }
+
   access_logs = {
-    bucket = "blog-alb-logs"
+    bucket = "blog-logs"
   }
 
   listeners = {
-    http-http-listeners = {
+    ex-http-https-redirect = {
       port     = 80
       protocol = "HTTP"
     }
@@ -87,7 +99,7 @@ module "alb" {
 
   target_groups = {
     ex-instance = {
-      name_prefix      = "blog"
+      name_prefix      = "h1"
       protocol         = "HTTP"
       port             = 80
       target_type      = "instance"
@@ -95,8 +107,8 @@ module "alb" {
   }
 
   tags = {
-    Environment = "Development"
-    Project     = "Terraform"
+    Environment = "Dev"
+    Project     = "Example"
   }
 }
 
