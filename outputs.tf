@@ -6,3 +6,6 @@ output "instance_arn" {
   value = aws_instance.blog.arn
 }
 
+output "target_az" {
+  value = aws.region
+}
