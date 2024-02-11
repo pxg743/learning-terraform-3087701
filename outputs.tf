@@ -7,5 +7,5 @@ output "instance_arn" {
 }
 
 output "target_az" {
-  value = aws.region
+  value = aws_region.current
 }
